@@ -1,4 +1,4 @@
-package com.bigdata.bigdata.common.hadoop;
+package com.bigdata.bigdata.common;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -18,9 +18,9 @@ import java.io.OutputStreamWriter;
  * 操作Hadoop
  */
 @Component
-public class HadoopSystemFileSystem {
+public class HadoopFileSystemUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(HadoopSystemFileSystem.class);
+    private static final Logger logger = LoggerFactory.getLogger(HadoopFileSystemUtil.class);
 
     @Autowired
     private FileSystem fileSystem;

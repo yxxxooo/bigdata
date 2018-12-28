@@ -9,6 +9,11 @@ logging:
 hadoop:
   uri: 'hdfs://192.168.10.244:9000'
   appendFile: true
+hbase:
+  zk:
+    clientPort: 2181
+    quorum: '192.168.10.244'
+  master: '192.168.10.244:60010'
 
 #NOSQL
 spring:

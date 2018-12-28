@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * 字符串&JSON 转换实体对象
- * yinxion
+ * yinxiong
  * @param <E>
  */
 public class ObjToEntity<E> {
