@@ -3,7 +3,9 @@ package com.bigdata.bigdata;
 import com.bigdata.bigdata.common.HadoopFileSystemUtil;
 import com.bigdata.bigdata.common.HbaseUtil;
 import com.bigdata.bigdata.common.RedisUtils;
+import com.bigdata.bigdata.entity.UcUserInfo;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.hadoop.hbase.ByteBufferKeyOnlyKeyValue;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.TableName;
@@ -50,39 +52,32 @@ public class BigdataApplicationTests {
     public void contextLoads() {
         try{
 //            hbaseUtil.listTab();
-            hbaseUtil.insertRow("t_user", "3", "info", "userId", "3");
-            hbaseUtil.insertRow("t_user", "3", "info", "userName", "zk");
-            hbaseUtil.getData("t_user", "3", null, null);
+//            UcUserInfo ucUserInfo = new UcUserInfo();
+//            ucUserInfo.setUcUserId(1L);
+//            ucUserInfo.setUserName("yinx");
+//            ucUserInfo.setEmail("287804524@qq.com");
+//            ucUserInfo.setAddress("北京");
+//            hbaseUtil.insertRow(ucUserInfo);
+//            UcUserInfo ucUserInfo1 = new UcUserInfo();
+//            ucUserInfo1.setUcUserId(2L);
+//            ucUserInfo1.setUserName("gaoy");
+//            ucUserInfo1.setEmail("15510099005");
+//            ucUserInfo1.setAddress("武汉");
+//            hbaseUtil.insertRow(ucUserInfo1);
+            long startTime = System.currentTimeMillis();
+//            UcUserInfo ucUserInfo = hbaseUtil.getByRow(UcUserInfo.class, "1", null,null);
+//            System.out.println(JSONObject.fromObject(ucUserInfo).toString());
+
+            List<UcUserInfo> list = hbaseUtil.getList(UcUserInfo.class, "ucUserId", "1");
+            System.out.println(JSONArray.fromObject(list).toString());
+            long endTime = System.currentTimeMillis();
+            System.out.println("运行时间:" + (endTime - startTime) + "ms");
+//            hbaseUtil.delTab("UcUserInfo");
+
         }catch (Exception e) {
             e.printStackTrace();
         }
 
-    }
-
-
-    public boolean insertRow(String tableName, String rowkey, String colFamily, String col, String val) throws Exception{
-        TableName tabName = TableName.valueOf(tableName);
-        if(!admin.tableExists(tabName)){
-            return false;
-        }
-
-        Table tabl =  connection.getTable(tabName);
-
-        Put put = new Put(rowkey.getBytes());
-        put.addColumn(colFamily.getBytes(), col.getBytes(), val.getBytes());
-        tabl.put(put);
-        tabl.close();
-//        TableName tabName = TableName.valueOf(tableName);
-//        if(!admin.tableExists(tabName)){
-//            return false;
-//        }
-//        Table tabl =  connection.getTable(tabName);
-//
-//        Put put = new Put(rowkey.getBytes());
-//        put.addColumn(colFamily.getBytes(), col.getBytes(), val.getBytes());
-//        tabl.put(put);
-//        tabl.close();
-        return true;
     }
 
 }
