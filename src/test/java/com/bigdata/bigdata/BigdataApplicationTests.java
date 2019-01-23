@@ -65,7 +65,7 @@ public class BigdataApplicationTests {
 //            ucUserInfo1.setAddress("武汉");
 //            hbaseUtil.insertRow(ucUserInfo1);
             long startTime = System.currentTimeMillis();
-//            UcUserInfo ucUserInfo = hbaseUtil.getByRow(UcUserInfo.class, "1", null,null);
+//            UcUserInfo ucUserInfo = hbaseUtil.getByRow(UcUserInfo.class, "3");
 //            System.out.println(JSONObject.fromObject(ucUserInfo).toString());
 
             List<UcUserInfo> list = hbaseUtil.getList(UcUserInfo.class, "ucUserId", "1");

@@ -2,11 +2,9 @@ package com.bigdata.bigdata.common;
 
 import com.bigdata.bigdata.entity.UcUser;
 import net.sf.json.JSONObject;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +94,7 @@ public class HbaseUtil {
     }
 
 
-    public ResultScanner getScanner(Class entityTab, String rowkey, String colFamily, String col){
+    public ResultScanner getScanner(Class entityTab, Filter ... filter){
         TableName tabName = TableName.valueOf(entityTab.getSimpleName());
         if(!tableExists(tabName)){
             return null;
@@ -109,15 +107,12 @@ public class HbaseUtil {
             logger.error(e.getMessage(),e);
             return null;
         }
-        Scan scan = new Scan();
-        if(rowkey != null && !rowkey.equalsIgnoreCase("")) {
-            scan.setRowPrefixFilter(Bytes.toBytes(rowkey));
-        }
-        if(colFamily != null && !colFamily.equalsIgnoreCase("") && col != null && !col.equalsIgnoreCase("")) {
-            scan.addColumn(colFamily.getBytes(), col.getBytes());
-            scan.
-        }
 
+        Scan scan = new Scan();
+        if(filter != null && filter.length > 0) {
+            FilterList filterList = new FilterList(filter);
+            scan.setFilter(filterList);
+        }
         try {
             return tab.getScanner(scan);
         }catch (Exception e) {
@@ -166,15 +161,15 @@ public class HbaseUtil {
     }
 
 
-    public <T> List<T> getList(Class<T> entityTab, String colFamily, String col) {
+    public <T> List<T> getList(Class<T> entityTab, String column, String parms) {
+        Filter columnFilter = new QualifierFilter(CompareOperator.EQUAL,new BinaryComparator(Bytes.toBytes(column)));
+        Filter parmsFilter = new ValueFilter(CompareOperator.EQUAL, new BinaryComparator(Bytes.toBytes(parms)));
+        Filter[] filters = new Filter[]{columnFilter,parmsFilter};
+        return getList(entityTab,filters);
+    }
 
-
-        Field[] fields = entityTab.getDeclaredFields();
-        if(fields.length <= 0){
-            return null;
-        }
-
-        ResultScanner hbaseResult = getScanner(entityTab,null,colFamily,col);
+    public <T> List<T> getList(Class<T> entityTab, Filter ... filter) {
+        ResultScanner hbaseResult = getScanner(entityTab,filter);
 
         List<T> returnList = new LinkedList<T>();
         for(Result result : hbaseResult) {
@@ -198,7 +193,7 @@ public class HbaseUtil {
         return returnList;
     }
 
-    public <T> T getByRow(Class<T> entityTab, String rowkey, String colFamily, String col){
+    public <T> T getByRow(Class<T> entityTab, String rowkey){
         Object obj = null;
         try{
             obj = entityTab.newInstance();
@@ -213,9 +208,13 @@ public class HbaseUtil {
             return null;
         }
 
-        ResultScanner hbaseResult = getScanner(entityTab,rowkey,colFamily,col);
+        Filter rowFilter = new RowFilter(CompareOperator.EQUAL, new BinaryComparator(Bytes.toBytes(rowkey)));
+        ResultScanner hbaseResult = getScanner(entityTab,rowFilter);
         try {
             Result result = hbaseResult.next();
+            if(result == null) {
+                return null;
+            }
             Cell[] cells = result.rawCells();
 
             for (int i = 0; i < cells.length; i++) {
